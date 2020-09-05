@@ -1,35 +1,41 @@
-package com.usoof.notesapp.data.entity
+package com.usoof.notesapp.data.local.entity
 
+import androidx.annotation.Nullable
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import org.jetbrains.annotations.NotNull
 
 @Entity(tableName = "notes")
 data class Note(
 
+    @NotNull
     @PrimaryKey(autoGenerate = true)
-    val id: Int,
+    var id: Long = 0,
 
     @ColumnInfo(name = "title")
-    val title: String,
+    var title: String,
 
     @ColumnInfo(name = "date_time")
-    val dateTime: String,
+    var dateTime: String,
 
     @ColumnInfo(name = "subtitle")
-    val subtitle: String,
+    var subtitle: String,
 
     @ColumnInfo(name = "note")
-    val note: String,
+    var note: String,
 
     @ColumnInfo(name = "image_path")
-    val imagePath: String,
+    var imagePath: String,
 
     @ColumnInfo(name = "color")
-    val color: String,
+    var color: String,
 
     @ColumnInfo(name = "web_link")
-    val webLink: String
+    var webLink: String
 ) {
+
+    constructor() : this(0, "", "", "", "", "", "", "")
+
     override fun toString(): String = "$title : $dateTime"
 }

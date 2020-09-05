@@ -130,7 +130,7 @@
                 android:layout_marginStart="@dimen/_12sdp"
                 android:layout_marginEnd="@dimen/_12sdp"
                 android:layout_marginBottom="@dimen/_15sdp"
-                android:hint="@string/note_subtitle"
+                android:hint="@string/add_your_note_here"
                 android:textColorHint="@color/colorTextHint"
                 app:hintTextColor="@color/colorTextHint"
                 app:layout_constraintTop_toBottomOf="@id/subtitleTextLayout"

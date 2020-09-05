@@ -39,13 +39,13 @@
             android:id="@+id/searchInputText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/search_background"
+            android:background="@drawable/background_search"
             android:imeOptions="actionDone"
             android:importantForAutofill="no"
             android:includeFontPadding="false"
+            android:inputType="text"
             android:textColor="@color/colorWhite"
             android:textSize="@dimen/_13ssp"
-            android:inputType="text"
             app:boxCornerRadiusBottomEnd="@dimen/_8sdp"
             app:boxCornerRadiusTopStart="@dimen/_8sdp" />
     </com.google.android.material.textfield.TextInputLayout>
@@ -57,11 +57,13 @@
         android:layout_marginStart="@dimen/_2sdp"
         android:layout_marginEnd="@dimen/_2sdp"
         android:clipToPadding="false"
-        android:paddingStart="0dp"
+        android:paddingTop="@dimen/_12sdp"
+        android:paddingStart="@dimen/_12sdp"
         android:paddingEnd="@dimen/_12sdp"
         android:paddingBottom="@dimen/_12sdp"
+        app:layout_constraintBottom_toTopOf="@id/footerLayout"
         app:layout_constraintTop_toBottomOf="@id/searchInputLayout"
-        app:layout_constraintBottom_toTopOf="@id/footerLayout"/>
+        tools:listitem="@layout/item_container_note" />
 
     <LinearLayout
         android:id="@+id/footerLayout"
@@ -106,13 +108,13 @@
         android:layout_width="@dimen/_40sdp"
         android:layout_height="@dimen/_40sdp"
         android:layout_marginEnd="@dimen/_30sdp"
+        android:background="@drawable/background_add"
         android:contentDescription="@string/app_name"
-        android:src="@drawable/ic_add_outer"
         android:padding="@dimen/_5sdp"
-        android:background="@drawable/add_background"
-        app:tint="@color/colorPrimary"
+        android:src="@drawable/ic_add_outer"
+        app:layout_constraintBottom_toTopOf="@id/footerLayout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/footerLayout"
-        app:layout_constraintBottom_toTopOf="@id/footerLayout"/>
+        app:tint="@color/colorPrimary" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
