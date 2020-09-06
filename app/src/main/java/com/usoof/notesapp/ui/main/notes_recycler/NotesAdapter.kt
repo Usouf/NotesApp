@@ -1,5 +1,7 @@
 package com.usoof.notesapp.ui.main.notes_recycler
 
+import android.graphics.Color
+import android.graphics.drawable.GradientDrawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -21,6 +23,12 @@ class NotesAdapter(private val notes: ArrayList<Note>) :
                 itemBinding.containerSubtitle.text = note.subtitle
             }
             itemBinding.containerDateTime.text = note.dateTime
+            val gradientDrawable = itemBinding.layoutContainer.background as GradientDrawable
+            if (note.color.isNotEmpty()) {
+                gradientDrawable.setColor(Color.parseColor(note.color))
+            } else {
+                gradientDrawable.setColor(Color.parseColor("#333333"))
+            }
         }
 
     }
