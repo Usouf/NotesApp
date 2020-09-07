@@ -1,5 +1,7 @@
 package com.usoof.notesapp.ui.add
 
+import android.graphics.BitmapFactory
+import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -7,8 +9,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.usoof.notesapp.data.local.entity.Note
 import com.usoof.notesapp.data.repository.NotesRepository
-import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 
 class CreateNoteViewModel(private val notesRepository: NotesRepository) : ViewModel() {
 
