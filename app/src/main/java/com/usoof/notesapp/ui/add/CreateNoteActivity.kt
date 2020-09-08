@@ -7,14 +7,17 @@ import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.GradientDrawable
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
+import android.util.Patterns
 import android.view.View
 import android.widget.LinearLayout
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -26,6 +29,7 @@ import com.usoof.notesapp.data.local.DatabaseBuilder
 import com.usoof.notesapp.data.local.dao.DaoHelperImpl
 import com.usoof.notesapp.data.local.entity.Note
 import com.usoof.notesapp.databinding.ActivityCreateNoteBinding
+import com.usoof.notesapp.databinding.LayoutAddUrlBinding
 import com.usoof.notesapp.ui.ViewModelFactory
 import kotlinx.coroutines.*
 import java.io.InputStream
@@ -51,6 +55,8 @@ class CreateNoteActivity : AppCompatActivity() {
 
     private var selectedColor = "#333333"
     private var imagePath = ""
+
+    private lateinit var dialogAddUrl: AlertDialog
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -126,6 +132,10 @@ class CreateNoteActivity : AppCompatActivity() {
         Log.d(TAG, "getNote: $imagePath")
         note.imagePath = imagePath
 
+        if (binding.layoutWebUrl.visibility == View.VISIBLE) {
+            note.webLink = binding.textWebUrl.text.toString()
+        }
+
         return note
 
     }
@@ -145,7 +155,6 @@ class CreateNoteActivity : AppCompatActivity() {
                 bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
             }
         }
-
 
         binding.layoutColorPickerContainer.viewColor1.setOnClickListener {
             selectedColor = "#333333"
@@ -197,7 +206,6 @@ class CreateNoteActivity : AppCompatActivity() {
             setSubtitleIndicatorColor()
         }
 
-
         binding.layoutColorPickerContainer.layoutAddImage.setOnClickListener {
             bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
             if (ContextCompat.checkSelfPermission(
@@ -213,6 +221,11 @@ class CreateNoteActivity : AppCompatActivity() {
             } else {
                 selectImage()
             }
+        }
+
+        binding.layoutColorPickerContainer.layoutAddUrl.setOnClickListener {
+            bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+            showAddUrlDialog()
         }
     }
 
@@ -273,11 +286,11 @@ class CreateNoteActivity : AppCompatActivity() {
         }
     }
 
-    private fun getImagePathFromUri(selectedImage: Uri?) : String {
+    private fun getImagePathFromUri(selectedImage: Uri?): String {
         var localImagePath = selectedImage?.path
-        selectedImage?.let {imageUri ->
+        selectedImage?.let { imageUri ->
             val cursor = contentResolver.query(imageUri, null, null, null, null)
-            cursor?.use {c ->
+            cursor?.use { c ->
                 c.moveToFirst()
                 localImagePath = cursor.getString(c.getColumnIndex(MediaStore.Images.Media.DATA))
                 c.close()
@@ -288,4 +301,40 @@ class CreateNoteActivity : AppCompatActivity() {
 
         return localImagePath!!
     }
+
+    private fun showAddUrlDialog() {
+
+        val builder = AlertDialog.Builder(this)
+        val addUrlBinding = LayoutAddUrlBinding.inflate(layoutInflater)
+        val view = addUrlBinding.root
+
+        builder.setView(view)
+
+        dialogAddUrl = builder.create()
+
+        if (dialogAddUrl.window != null) {
+            dialogAddUrl.window?.setBackgroundDrawable(ColorDrawable(0))
+        }
+
+        addUrlBinding.editUrl.requestFocus()
+
+        addUrlBinding.buttonDoneAddUrl.setOnClickListener {
+            if (addUrlBinding.editUrl.text.toString().trim().isEmpty()) {
+                Toast.makeText(this, "Enter URL", Toast.LENGTH_SHORT).show()
+            } else if (!Patterns.WEB_URL.matcher(addUrlBinding.editUrl.text.toString()).matches()) {
+                Toast.makeText(this, "Enter a valid URL", Toast.LENGTH_SHORT).show()
+            } else {
+                binding.textWebUrl.text = addUrlBinding.editUrl.text.toString()
+                binding.layoutWebUrl.visibility = View.VISIBLE
+                dialogAddUrl.dismiss()
+            }
+        }
+
+        addUrlBinding.buttonCancelAddUrl.setOnClickListener {
+            dialogAddUrl.dismiss()
+        }
+
+        dialogAddUrl.show()
+    }
+
 }
