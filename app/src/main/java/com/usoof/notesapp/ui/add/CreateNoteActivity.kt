@@ -31,6 +31,7 @@ import com.usoof.notesapp.data.local.entity.Note
 import com.usoof.notesapp.databinding.ActivityCreateNoteBinding
 import com.usoof.notesapp.databinding.LayoutAddUrlBinding
 import com.usoof.notesapp.ui.ViewModelFactory
+import com.usoof.notesapp.ui.main.MainActivity
 import kotlinx.coroutines.*
 import java.io.InputStream
 import java.text.SimpleDateFormat
@@ -54,9 +55,11 @@ class CreateNoteActivity : AppCompatActivity() {
     private lateinit var viewModel: CreateNoteViewModel
 
     private var selectedColor = "#333333"
-    private var imagePath = ""
+    private var selectedImagePath = ""
 
     private lateinit var dialogAddUrl: AlertDialog
+
+    private var availableNote: Note? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -66,16 +69,47 @@ class CreateNoteActivity : AppCompatActivity() {
 
         setupUI()
 
+        if (intent.getBooleanExtra(MainActivity.EXTRA_CODE_ISVIEWORUPDATE, false)) {
+            availableNote = intent.getParcelableExtra(MainActivity.EXTRA_CODE_NOTE)
+            setViewOrUpdateNote()
+        }
+
         setupViewModel()
+
+        initColorPicker()
+        setSubtitleIndicatorColor()
 
         setupObservers()
 
     }
 
-    private fun setupUI() {
+    private fun setViewOrUpdateNote() {
+        availableNote?.apply {
+            binding.titleText.setText(title)
+            binding.textDateTime.text = dateTime
+            binding.subtitleText.setText(subtitle)
+            binding.noteText.setText(note)
 
-        initColorPicker()
-        setSubtitleIndicatorColor()
+            if (imagePath.trim().isNotEmpty()) {
+                Log.d(TAG, "setViewOrUpdateNote: image = $imagePath")
+                binding.imageNote.setImageBitmap(BitmapFactory.decodeFile(imagePath))
+                binding.imageNote.visibility = View.VISIBLE
+                selectedImagePath = imagePath
+            } else {
+                Log.d(TAG, "setViewOrUpdateNote: image isEmpty")
+            }
+
+            if (webLink.trim().isNotEmpty()) {
+                Log.d(TAG, "setViewOrUpdateNote: weblink = $webLink")
+                binding.textWebUrl.text = webLink
+                binding.layoutWebUrl.visibility = View.VISIBLE
+            }
+
+
+        }
+    }
+
+    private fun setupUI() {
 
         binding.imageBack.setOnClickListener {
             onBackPressed()
@@ -124,13 +158,17 @@ class CreateNoteActivity : AppCompatActivity() {
 
         val note = Note()
 
+        availableNote?.apply {
+            note.id = id
+        }
+
         note.title = binding.titleText.text.toString()
         note.subtitle = binding.subtitleText.text.toString()
         note.note = binding.noteText.text.toString()
         note.dateTime = binding.textDateTime.text.toString()
         note.color = selectedColor
-        Log.d(TAG, "getNote: $imagePath")
-        note.imagePath = imagePath
+        Log.d(TAG, "getNote: $selectedImagePath")
+        note.imagePath = selectedImagePath
 
         if (binding.layoutWebUrl.visibility == View.VISIBLE) {
             note.webLink = binding.textWebUrl.text.toString()
@@ -206,6 +244,20 @@ class CreateNoteActivity : AppCompatActivity() {
             setSubtitleIndicatorColor()
         }
 
+        availableNote?.apply {
+            if (color.trim().isNotEmpty()) {
+                Log.d(TAG, "setViewOrUpdateNote: color = $color")
+                when (color) {
+                    "#FDBE3B" -> binding.layoutColorPickerContainer.viewColor2.performClick()
+                    "#FF4842" -> binding.layoutColorPickerContainer.viewColor3.performClick()
+                    "#3A52FC" -> binding.layoutColorPickerContainer.viewColor4.performClick()
+                    "#000000" -> binding.layoutColorPickerContainer.viewColor5.performClick()
+                }
+            } else {
+                Log.d(TAG, "setViewOrUpdateNote: color isEmpty")
+            }
+        }
+
         binding.layoutColorPickerContainer.layoutAddImage.setOnClickListener {
             bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
             if (ContextCompat.checkSelfPermission(
@@ -264,8 +316,8 @@ class CreateNoteActivity : AppCompatActivity() {
 
             }
 
-            imagePath = getImagePathFromUri(selectedImageUri)
-            Log.d(TAG, "onActivityResult: $imagePath")
+            selectedImagePath = getImagePathFromUri(selectedImageUri)
+            Log.d(TAG, "onActivityResult: $selectedImagePath")
 
         }
     }

@@ -1,28 +1,20 @@
 package com.usoof.notesapp.ui.main.notes_recycler
 
-import android.Manifest
-import android.content.Context
-import android.content.pm.PackageManager
-import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
-import android.os.Environment
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.usoof.notesapp.data.local.entity.Note
 import com.usoof.notesapp.databinding.ItemContainerNoteBinding
-import com.usoof.notesapp.ui.add.CreateNoteViewModel
-import kotlinx.coroutines.*
-import java.io.File
 
-class NotesAdapter(private val notes: ArrayList<Note>) :
+class NotesAdapter(
+    private val notes: ArrayList<Note>,
+    private val clickListener: NoteClickListener
+) :
     RecyclerView.Adapter<NotesAdapter.NotesViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NotesViewHolder =
@@ -30,8 +22,12 @@ class NotesAdapter(private val notes: ArrayList<Note>) :
 
     override fun getItemCount(): Int = notes.size
 
-    override fun onBindViewHolder(holder: NotesViewHolder, position: Int) =
+    override fun onBindViewHolder(holder: NotesViewHolder, position: Int) {
         holder.bind(notes[position])
+        holder.itemBinding.layoutContainer.setOnClickListener {
+            clickListener.onNoteClicked(notes[position], position)
+        }
+    }
 
     fun addInsertedNote(note: Note) {
         notes.add(0, note)
@@ -43,7 +39,7 @@ class NotesAdapter(private val notes: ArrayList<Note>) :
         notifyDataSetChanged()
     }
 
-    class NotesViewHolder(private val itemBinding: ItemContainerNoteBinding) :
+    class NotesViewHolder(val itemBinding: ItemContainerNoteBinding) :
         RecyclerView.ViewHolder(itemBinding.root) {
 
         companion object {

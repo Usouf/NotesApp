@@ -14,12 +14,16 @@ import com.usoof.notesapp.data.local.entity.Note
 import com.usoof.notesapp.databinding.ActivityMainBinding
 import com.usoof.notesapp.ui.ViewModelFactory
 import com.usoof.notesapp.ui.add.CreateNoteActivity
+import com.usoof.notesapp.ui.main.notes_recycler.NoteClickListener
 import com.usoof.notesapp.ui.main.notes_recycler.NotesAdapter
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), NoteClickListener {
 
     companion object {
         const val REQUEST_CODE_ADD_NOTE = 1
+        const val REQUEST_CODE_UPDATE_NOTE = 2
+        const val EXTRA_CODE_NOTE = "NOTE"
+        const val EXTRA_CODE_ISVIEWORUPDATE = "IS VIEW OR UPDATE"
         const val TAG = "Main Activity"
     }
 
@@ -51,7 +55,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         noteList = ArrayList()
-        notesAdapter = NotesAdapter(noteList)
+        notesAdapter = NotesAdapter(noteList, this)
 
         binding.notesRecyclerView.apply {
             layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
@@ -87,5 +91,12 @@ class MainActivity : AppCompatActivity() {
                 viewModel.getResults(it)
             }
         }
+    }
+
+    override fun onNoteClicked(note: Note, position: Int) {
+        val intent = Intent(applicationContext, CreateNoteActivity::class.java)
+        intent.putExtra(EXTRA_CODE_ISVIEWORUPDATE, true)
+        intent.putExtra(EXTRA_CODE_NOTE, note)
+        startActivityForResult(intent, REQUEST_CODE_UPDATE_NOTE)
     }
 }
