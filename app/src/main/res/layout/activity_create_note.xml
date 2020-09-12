@@ -126,13 +126,13 @@
                 android:id="@+id/imageNote"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/_15sdp"
                 android:layout_marginStart="@dimen/_12sdp"
+                android:layout_marginTop="@dimen/_15sdp"
                 android:layout_marginEnd="@dimen/_12sdp"
                 android:adjustViewBounds="true"
                 android:contentDescription="@string/app_name"
                 android:visibility="gone"
-                app:layout_constraintTop_toBottomOf="@id/subtitleTextLayout"/>
+                app:layout_constraintTop_toBottomOf="@id/subtitleTextLayout" />
 
             <LinearLayout
                 android:id="@+id/layoutWebUrl"
@@ -154,10 +154,10 @@
                     android:autoLink="web"
                     android:fontFamily="@font/ubuntu_regular"
                     android:includeFontPadding="false"
-                    android:textSize="@dimen/_13ssp"/>
+                    android:textSize="@dimen/_13ssp" />
 
             </LinearLayout>
-            
+
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/noteTextLayout"
                 android:layout_width="match_parent"
@@ -176,8 +176,8 @@
                     android:id="@+id/noteText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="top|start"
                     android:background="@color/colorPrimary"
+                    android:gravity="top|start"
                     android:importantForAutofill="no"
                     android:includeFontPadding="false"
                     android:inputType="textMultiLine"

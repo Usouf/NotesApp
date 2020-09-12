@@ -29,9 +29,17 @@ class NotesAdapter(
         }
     }
 
-    fun addInsertedNote(note: Note) {
-        notes.add(0, note)
-        notifyItemInserted(0)
+    fun addInsertedNote(note: Note, position: Int) {
+
+        if (position == 0) {
+            notes.add(0, note)
+            notifyItemInserted(0)
+        } else {
+            notes.removeAt(position)
+            notes.add(position, note)
+            notifyItemChanged(position)
+        }
+
     }
 
     fun addAllNotes(noteList: List<Note>) {

@@ -8,7 +8,8 @@ import com.usoof.notesapp.data.local.entity.Note
 @Database(
     entities = [Note::class],
     version = 1,
-    exportSchema = false )
+    exportSchema = false
+)
 abstract class DatabaseService : RoomDatabase() {
 
     abstract fun noteDao(): NoteDao

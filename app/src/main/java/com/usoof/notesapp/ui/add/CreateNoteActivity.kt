@@ -41,7 +41,7 @@ class CreateNoteActivity : AppCompatActivity() {
 
     companion object {
         const val TAG = "Create Note Activity"
-        const val INSERTED_NOTE_ID = "Inserted Note ID"
+        const val NOTE_ID = "INSERTED NOTE ID"
         const val REQUEST_CODE_STORAGE_PERMISSION = 1
         const val REQUEST_CODE_SELECT_IMAGE = 2
     }
@@ -121,6 +121,7 @@ class CreateNoteActivity : AppCompatActivity() {
         binding.imageDone.setOnClickListener {
             val note: Note? = getNote()
             Log.d(TAG, "setupUI: $note : ${note?.id}")
+
             if (note != null) {
                 viewModel.insertNotes(note)
             }
@@ -136,12 +137,16 @@ class CreateNoteActivity : AppCompatActivity() {
     }
 
     private fun setupObservers() {
-        viewModel.getNotes().observe(this, Observer {
-            val intent = Intent()
-            intent.putExtra(INSERTED_NOTE_ID, it)
-            setResult(RESULT_OK, intent)
-            finish()
+        viewModel.getInsertedNotes().observe(this, Observer {
+            returnIntentResult(it)
         })
+    }
+
+    private fun returnIntentResult(noteId: Long) {
+        val intent = Intent()
+        intent.putExtra(NOTE_ID, noteId)
+        setResult(RESULT_OK, intent)
+        finish()
     }
 
     private fun getNote(): Note? {
@@ -253,8 +258,6 @@ class CreateNoteActivity : AppCompatActivity() {
                     "#3A52FC" -> binding.layoutColorPickerContainer.viewColor4.performClick()
                     "#000000" -> binding.layoutColorPickerContainer.viewColor5.performClick()
                 }
-            } else {
-                Log.d(TAG, "setViewOrUpdateNote: color isEmpty")
             }
         }
 
@@ -344,7 +347,7 @@ class CreateNoteActivity : AppCompatActivity() {
             val cursor = contentResolver.query(imageUri, null, null, null, null)
             cursor?.use { c ->
                 c.moveToFirst()
-                localImagePath = cursor.getString(c.getColumnIndex(MediaStore.Images.Media.DATA))
+                localImagePath = cursor.getString(c.getColumnIndex("_data"))
                 c.close()
             }
         }

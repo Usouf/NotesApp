@@ -17,6 +17,7 @@ class MainViewModel(private val notesRepository: NotesRepository) : ViewModel() 
 
     private val notesList = MutableLiveData<List<Note>>()
     private val insertedNote = MutableLiveData<Note>()
+    private val updatedNote = MutableLiveData<Note>()
 
     init {
         fetchNotes()
@@ -47,8 +48,23 @@ class MainViewModel(private val notesRepository: NotesRepository) : ViewModel() 
         }
     }
 
+    private fun getUpdatedNote(id: Long) {
+        viewModelScope.launch {
+            try {
+                val noteById = notesRepository.getNoteById(id)
+                updatedNote.postValue(noteById)
+            } catch (e: Exception) {
+                Log.d(TAG, "getUpdatedNote: $e")
+            }
+        }
+    }
+
     fun getResults(id: Long) {
         getInsertedNote(id)
+    }
+
+    fun getUpdatedResults(id: Long) {
+        getUpdatedNote(id)
     }
 
     fun getInsertedNote(): LiveData<Note> =
@@ -56,5 +72,8 @@ class MainViewModel(private val notesRepository: NotesRepository) : ViewModel() 
 
     fun getNotes(): LiveData<List<Note>> =
         notesList
+
+    fun getUpdatedNote(): LiveData<Note> =
+        updatedNote
 
 }
