@@ -89,7 +89,12 @@ class MainActivity : AppCompatActivity(), NoteClickListener {
         viewModel.getUpdatedNote().observe(this, Observer {
             clickedNotePosition?.let { position ->
                 notesAdapter.addUpdatedNote(it, position)
-                binding.notesRecyclerView.smoothScrollToPosition(position)
+            }
+        })
+
+        viewModel.getIsNoteDeleted().observe(this, Observer {
+            clickedNotePosition?.let {
+                notesAdapter.deleteNote(it)
             }
         })
     }
@@ -101,14 +106,19 @@ class MainActivity : AppCompatActivity(), NoteClickListener {
 
         if (requestCode == REQUEST_CODE_ADD_NOTE && resultCode == Activity.RESULT_OK) {
 
-            data?.getLongExtra(CreateNoteActivity.NOTE_ID, 0)?.run {
-                viewModel.getResults(this)
+            data?.getLongExtra(CreateNoteActivity.NOTE_ID, 0)?.let {
+                viewModel.getResults(it)
             }
 
         } else if (requestCode == REQUEST_CODE_UPDATE_NOTE && resultCode == Activity.RESULT_OK) {
 
-            data?.getLongExtra(CreateNoteActivity.NOTE_ID, 0)?.run {
-                viewModel.getUpdatedResults(this)
+            data?.getBooleanExtra(CreateNoteActivity.NOTE_ISDELETED, false)?.let {
+                viewModel.isNoteDeleted(it)
+                return
+            }
+
+            data?.getLongExtra(CreateNoteActivity.NOTE_ID, 0)?.let {
+                viewModel.getUpdatedResults(it)
             }
 
         }

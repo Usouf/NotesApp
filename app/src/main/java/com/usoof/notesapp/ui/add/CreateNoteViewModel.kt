@@ -17,7 +17,7 @@ class CreateNoteViewModel(private val notesRepository: NotesRepository) : ViewMo
     }
 
     private val insertedNoteId = MutableLiveData<Long>()
-
+    private val noteDeleted = MutableLiveData<Boolean>()
 
     private val exceptionHandler = CoroutineExceptionHandler { _, exception ->
         Log.d(TAG, "$exception")
@@ -33,7 +33,17 @@ class CreateNoteViewModel(private val notesRepository: NotesRepository) : ViewMo
 
     }
 
+    fun deleteNote(note: Note) {
+        viewModelScope.launch(exceptionHandler) {
+            notesRepository.deleteNote(note)
+            noteDeleted.postValue(true)
+        }
+    }
+
     fun getInsertedNotes(): LiveData<Long> =
         insertedNoteId
+
+    fun getIsDeleted(): LiveData<Boolean> =
+        noteDeleted
 
 }

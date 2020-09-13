@@ -26,22 +26,23 @@ class NotesAdapter(
     override fun getItemCount(): Int = notes.size
 
     override fun onBindViewHolder(holder: NotesViewHolder, position: Int) {
-        Log.d(TAG, "onBindViewHolder: notes = ${notes[position]}")
         holder.bind(notes[position])
         holder.itemBinding.layoutContainer.setOnClickListener {
-            Log.d(TAG, "onBindViewHolder: clicked note = note @$position")
             clickListener.onNoteClicked(notes[position], position)
         }
     }
 
+    fun deleteNote(position: Int) {
+        notes.removeAt(position)
+        notifyItemRemoved(position)
+    }
+
     fun addInsertedNote(note: Note) {
-        Log.d(TAG, "addInsertedNote: inserting notes")
         notes.add(0, note)
         notifyDataSetChanged()
     }
 
     fun addUpdatedNote(note: Note, position: Int) {
-        Log.d(TAG, "addUpdatedNote: updating notes")
         notes.removeAt(position)
         notes.add(position, note)
         notifyItemChanged(position)

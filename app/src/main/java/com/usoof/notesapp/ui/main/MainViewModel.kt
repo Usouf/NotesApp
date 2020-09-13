@@ -18,6 +18,7 @@ class MainViewModel(private val notesRepository: NotesRepository) : ViewModel() 
     private val notesList = MutableLiveData<List<Note>>()
     private val insertedNote = MutableLiveData<Note>()
     private val updatedNote = MutableLiveData<Note>()
+    private val isNoteDeleted = MutableLiveData<Boolean>()
 
     init {
         fetchNotes()
@@ -36,7 +37,7 @@ class MainViewModel(private val notesRepository: NotesRepository) : ViewModel() 
         }
     }
 
-    private fun getInsertedNote(id: Long) {
+    fun getResults(id: Long) {
         viewModelScope.launch {
             try {
                 Log.d(TAG, "getInsertedNote: getting note")
@@ -48,7 +49,7 @@ class MainViewModel(private val notesRepository: NotesRepository) : ViewModel() 
         }
     }
 
-    private fun getUpdatedNote(id: Long) {
+    fun getUpdatedResults(id: Long) {
         viewModelScope.launch {
             try {
                 val noteById = notesRepository.getNoteById(id)
@@ -59,12 +60,8 @@ class MainViewModel(private val notesRepository: NotesRepository) : ViewModel() 
         }
     }
 
-    fun getResults(id: Long) {
-        getInsertedNote(id)
-    }
-
-    fun getUpdatedResults(id: Long) {
-        getUpdatedNote(id)
+    fun isNoteDeleted(deleted: Boolean) {
+        isNoteDeleted.postValue(deleted)
     }
 
     fun getInsertedNote(): LiveData<Note> =
@@ -76,4 +73,6 @@ class MainViewModel(private val notesRepository: NotesRepository) : ViewModel() 
     fun getUpdatedNote(): LiveData<Note> =
         updatedNote
 
+    fun getIsNoteDeleted(): LiveData<Boolean> =
+        isNoteDeleted
 }

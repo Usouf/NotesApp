@@ -30,6 +30,7 @@ import com.usoof.notesapp.data.local.dao.DaoHelperImpl
 import com.usoof.notesapp.data.local.entity.Note
 import com.usoof.notesapp.databinding.ActivityCreateNoteBinding
 import com.usoof.notesapp.databinding.LayoutAddUrlBinding
+import com.usoof.notesapp.databinding.LayoutDeleteNoteBinding
 import com.usoof.notesapp.ui.ViewModelFactory
 import com.usoof.notesapp.ui.main.MainActivity
 import kotlinx.coroutines.*
@@ -42,6 +43,7 @@ class CreateNoteActivity : AppCompatActivity() {
     companion object {
         const val TAG = "Create Note Activity"
         const val NOTE_ID = "INSERTED NOTE ID"
+        const val NOTE_ISDELETED = "ISDELETED"
         const val REQUEST_CODE_STORAGE_PERMISSION = 1
         const val REQUEST_CODE_SELECT_IMAGE = 2
     }
@@ -58,6 +60,7 @@ class CreateNoteActivity : AppCompatActivity() {
     private var selectedImagePath = ""
 
     private lateinit var dialogAddUrl: AlertDialog
+    private lateinit var dialogDeleteNote: AlertDialog
 
     private var availableNote: Note? = null
 
@@ -152,6 +155,13 @@ class CreateNoteActivity : AppCompatActivity() {
         viewModel.getInsertedNotes().observe(this, Observer {
             val intent = Intent()
             intent.putExtra(NOTE_ID, it)
+            setResult(RESULT_OK, intent)
+            finish()
+        })
+
+        viewModel.getIsDeleted().observe(this, Observer {
+            val intent = Intent()
+            intent.putExtra(NOTE_ISDELETED, it)
             setResult(RESULT_OK, intent)
             finish()
         })
@@ -290,6 +300,14 @@ class CreateNoteActivity : AppCompatActivity() {
             bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
             showAddUrlDialog()
         }
+
+        availableNote?.let {
+            binding.layoutColorPickerContainer.layoutRemoveNote.visibility = View.VISIBLE
+            binding.layoutColorPickerContainer.layoutRemoveNote.setOnClickListener {
+                bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+                showDeleteNoteDialog()
+            }
+        }
     }
 
     private fun selectImage() {
@@ -399,6 +417,34 @@ class CreateNoteActivity : AppCompatActivity() {
         }
 
         dialogAddUrl.show()
+    }
+
+    private fun showDeleteNoteDialog() {
+
+        val builder = AlertDialog.Builder(this)
+        val deleteNoteBinding = LayoutDeleteNoteBinding.inflate(layoutInflater)
+        val view = deleteNoteBinding.root
+
+        builder.setView(view)
+
+        dialogDeleteNote = builder.create()
+
+        if (dialogDeleteNote.window != null) {
+            dialogDeleteNote.window?.setBackgroundDrawable(ColorDrawable(0))
+        }
+
+        deleteNoteBinding.buttonDelete.setOnClickListener {
+            availableNote?.let {
+                viewModel.deleteNote(it)
+            }
+        }
+
+        deleteNoteBinding.buttonCancel.setOnClickListener {
+            dialogDeleteNote.dismiss()
+        }
+
+        dialogDeleteNote.show()
+
     }
 
 }
