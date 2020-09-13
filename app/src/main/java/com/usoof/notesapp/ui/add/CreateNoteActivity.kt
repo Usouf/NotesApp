@@ -94,6 +94,7 @@ class CreateNoteActivity : AppCompatActivity() {
                 Log.d(TAG, "setViewOrUpdateNote: image = $imagePath")
                 binding.imageNote.setImageBitmap(BitmapFactory.decodeFile(imagePath))
                 binding.imageNote.visibility = View.VISIBLE
+                binding.imageNoteDelete.visibility = View.VISIBLE
                 selectedImagePath = imagePath
             } else {
                 Log.d(TAG, "setViewOrUpdateNote: image isEmpty")
@@ -127,6 +128,17 @@ class CreateNoteActivity : AppCompatActivity() {
             }
         }
 
+        binding.imageNoteDelete.setOnClickListener {
+            binding.imageNote.setImageBitmap(null)
+            binding.imageNote.visibility = View.GONE
+            binding.imageNoteDelete.visibility = View.GONE
+            selectedImagePath = ""
+        }
+
+        binding.imageWebUrlDelete.setOnClickListener {
+            binding.textWebUrl.text = ""
+            binding.layoutWebUrl.visibility = View.GONE
+        }
     }
 
     private fun setupViewModel() {
@@ -138,15 +150,11 @@ class CreateNoteActivity : AppCompatActivity() {
 
     private fun setupObservers() {
         viewModel.getInsertedNotes().observe(this, Observer {
-            returnIntentResult(it)
+            val intent = Intent()
+            intent.putExtra(NOTE_ID, it)
+            setResult(RESULT_OK, intent)
+            finish()
         })
-    }
-
-    private fun returnIntentResult(noteId: Long) {
-        val intent = Intent()
-        intent.putExtra(NOTE_ID, noteId)
-        setResult(RESULT_OK, intent)
-        finish()
     }
 
     private fun getNote(): Note? {
@@ -338,6 +346,7 @@ class CreateNoteActivity : AppCompatActivity() {
         withContext(Dispatchers.Main) {
             binding.imageNote.setImageBitmap(bitmap)
             binding.imageNote.visibility = View.VISIBLE
+            binding.imageNoteDelete.visibility = View.VISIBLE
         }
     }
 

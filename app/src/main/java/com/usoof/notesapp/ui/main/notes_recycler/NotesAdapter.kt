@@ -14,8 +14,11 @@ import com.usoof.notesapp.databinding.ItemContainerNoteBinding
 class NotesAdapter(
     private val notes: ArrayList<Note>,
     private val clickListener: NoteClickListener
-) :
-    RecyclerView.Adapter<NotesAdapter.NotesViewHolder>() {
+) : RecyclerView.Adapter<NotesAdapter.NotesViewHolder>() {
+
+    companion object {
+        const val TAG = "Notes Adapter"
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NotesViewHolder =
         NotesViewHolder(ItemContainerNoteBinding.inflate(LayoutInflater.from(parent.context)))
@@ -23,23 +26,25 @@ class NotesAdapter(
     override fun getItemCount(): Int = notes.size
 
     override fun onBindViewHolder(holder: NotesViewHolder, position: Int) {
+        Log.d(TAG, "onBindViewHolder: notes = ${notes[position]}")
         holder.bind(notes[position])
         holder.itemBinding.layoutContainer.setOnClickListener {
+            Log.d(TAG, "onBindViewHolder: clicked note = note @$position")
             clickListener.onNoteClicked(notes[position], position)
         }
     }
 
-    fun addInsertedNote(note: Note, position: Int) {
+    fun addInsertedNote(note: Note) {
+        Log.d(TAG, "addInsertedNote: inserting notes")
+        notes.add(0, note)
+        notifyDataSetChanged()
+    }
 
-        if (position == 0) {
-            notes.add(0, note)
-            notifyItemInserted(0)
-        } else {
-            notes.removeAt(position)
-            notes.add(position, note)
-            notifyItemChanged(position)
-        }
-
+    fun addUpdatedNote(note: Note, position: Int) {
+        Log.d(TAG, "addUpdatedNote: updating notes")
+        notes.removeAt(position)
+        notes.add(position, note)
+        notifyItemChanged(position)
     }
 
     fun addAllNotes(noteList: List<Note>) {
@@ -49,10 +54,6 @@ class NotesAdapter(
 
     class NotesViewHolder(val itemBinding: ItemContainerNoteBinding) :
         RecyclerView.ViewHolder(itemBinding.root) {
-
-        companion object {
-            const val TAG = "Notes ViewHolder"
-        }
 
         fun bind(note: Note) {
             itemBinding.containerTitle.text = note.title
@@ -70,11 +71,9 @@ class NotesAdapter(
             }
 
             if (note.imagePath.isNotEmpty()) {
-                Log.d(TAG, "bind: available ${note.imagePath}")
                 itemBinding.imageNote.setImageBitmap(BitmapFactory.decodeFile(note.imagePath))
                 itemBinding.imageNote.visibility = View.VISIBLE
             } else {
-                Log.d(TAG, "bind: empty ${note.imagePath}")
                 itemBinding.imageNote.visibility = View.GONE
             }
         }

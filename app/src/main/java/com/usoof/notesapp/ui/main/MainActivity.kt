@@ -32,7 +32,6 @@ class MainActivity : AppCompatActivity(), NoteClickListener {
     private lateinit var viewModel: MainViewModel
 
     private lateinit var notesAdapter: NotesAdapter
-    private lateinit var noteList: ArrayList<Note>
 
     private var clickedNotePosition: Int? = null
 
@@ -51,66 +50,78 @@ class MainActivity : AppCompatActivity(), NoteClickListener {
     }
 
     private fun setupUI() {
+
         binding.imageOuterAdd.setOnClickListener {
             val intent = Intent(applicationContext, CreateNoteActivity::class.java)
             startActivityForResult(intent, REQUEST_CODE_ADD_NOTE)
         }
 
-        noteList = ArrayList()
-        notesAdapter = NotesAdapter(noteList, this)
+        notesAdapter = NotesAdapter(ArrayList(), this)
 
         binding.notesRecyclerView.apply {
             layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
             adapter = notesAdapter
         }
+
     }
 
     private fun setupViewModel() {
+
         viewModel = ViewModelProvider(
             this,
             ViewModelFactory(DaoHelperImpl(DatabaseBuilder.getInstance(this)))
         ).get(MainViewModel::class.java)
+
     }
 
     private fun setupObservers() {
+
         viewModel.getNotes().observe(this, Observer {
             Log.d(TAG, it.toString())
-            Log.d(TAG, "${it.size}")
             notesAdapter.addAllNotes(it)
         })
 
         viewModel.getInsertedNote().observe(this, Observer {
-            notesAdapter.addInsertedNote(it, 0)
+            notesAdapter.addInsertedNote(it)
             binding.notesRecyclerView.smoothScrollToPosition(0)
         })
 
         viewModel.getUpdatedNote().observe(this, Observer {
             clickedNotePosition?.let { position ->
-                notesAdapter.addInsertedNote(it, position)
+                notesAdapter.addUpdatedNote(it, position)
                 binding.notesRecyclerView.smoothScrollToPosition(position)
             }
         })
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        Log.d(TAG, "onActivityResult: Result Received")
         super.onActivityResult(requestCode, resultCode, data)
+
+        Log.d(TAG, "onActivityResult: $requestCode")
+
         if (requestCode == REQUEST_CODE_ADD_NOTE && resultCode == Activity.RESULT_OK) {
+
             data?.getLongExtra(CreateNoteActivity.NOTE_ID, 0)?.run {
                 viewModel.getResults(this)
             }
+
         } else if (requestCode == REQUEST_CODE_UPDATE_NOTE && resultCode == Activity.RESULT_OK) {
+
             data?.getLongExtra(CreateNoteActivity.NOTE_ID, 0)?.run {
                 viewModel.getUpdatedResults(this)
             }
+
         }
     }
 
     override fun onNoteClicked(note: Note, position: Int) {
+
         clickedNotePosition = position
+
         val intent = Intent(applicationContext, CreateNoteActivity::class.java)
         intent.putExtra(EXTRA_CODE_ISVIEWORUPDATE, true)
         intent.putExtra(EXTRA_CODE_NOTE, note)
         startActivityForResult(intent, REQUEST_CODE_UPDATE_NOTE)
+
     }
 }
