@@ -10,15 +10,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.usoof.notesapp.R
 import com.usoof.notesapp.data.local.entity.Note
-import com.usoof.notesapp.databinding.ItemContainerNoteBinding
-import io.reactivex.Observable
-import io.reactivex.ObservableEmitter
-import io.reactivex.ObservableOnSubscribe
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.schedulers.Schedulers
+import kotlinx.android.synthetic.main.item_container_note.view.*
 import java.util.*
-import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
 
 class NotesAdapter(
@@ -34,7 +29,9 @@ class NotesAdapter(
     private var timer: Timer? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NotesViewHolder =
-        NotesViewHolder(ItemContainerNoteBinding.inflate(LayoutInflater.from(parent.context)))
+        NotesViewHolder(
+            LayoutInflater.from(parent.context).inflate(R.layout.item_container_note, parent, false)
+        )
 
     override fun getItemCount(): Int = notes.size
 
@@ -104,8 +101,8 @@ class NotesAdapter(
         }
     }
 
-    class NotesViewHolder(val itemBinding: ItemContainerNoteBinding) :
-        RecyclerView.ViewHolder(itemBinding.root) {
+    class NotesViewHolder(val itemBinding: View) :
+        RecyclerView.ViewHolder(itemBinding) {
 
         fun bind(note: Note) {
             itemBinding.containerTitle.text = note.title
