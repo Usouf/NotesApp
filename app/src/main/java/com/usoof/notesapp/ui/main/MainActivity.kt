@@ -3,6 +3,8 @@ package com.usoof.notesapp.ui.main
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
@@ -63,6 +65,21 @@ class MainActivity : AppCompatActivity(), NoteClickListener {
             adapter = notesAdapter
         }
 
+        binding.searchInputText.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) {
+                s?.let {
+                    notesAdapter.searchNotes(it.toString())
+                }
+            }
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                notesAdapter.cancelSearch()
+            }
+        })
+
     }
 
     private fun setupViewModel() {
@@ -113,8 +130,10 @@ class MainActivity : AppCompatActivity(), NoteClickListener {
         } else if (requestCode == REQUEST_CODE_UPDATE_NOTE && resultCode == Activity.RESULT_OK) {
 
             data?.getBooleanExtra(CreateNoteActivity.NOTE_ISDELETED, false)?.let {
-                viewModel.isNoteDeleted(it)
-                return
+                if (it) {
+                    viewModel.isNoteDeleted(it)
+                    return
+                }
             }
 
             data?.getLongExtra(CreateNoteActivity.NOTE_ID, 0)?.let {
